@@ -1,0 +1,27 @@
+# Objective: Should compile XeLaTeX resume to PDF on each push to main
+# This is a an experiment to figure out quicker workflows than using Overleaf.com
+name: Resume Generate  # Name shown in the GitHub Actions UI
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:  
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX with XeLaTeX
+        uses: xu-cheng/latex-action@v3  # LaTeX GitHub Action that wraps latexmk
+        with:
+          root_file: Ben_Kinchen_Resume.tex
+          latexmk_use_xelatex: true  # Should latexmk to use XeLaTeX
+
+      - name: Upload compiled PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume-pdf
+          path: Ben_Kinchen_Resume.pdf
