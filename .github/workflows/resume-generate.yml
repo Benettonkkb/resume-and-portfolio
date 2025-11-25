@@ -1,11 +1,19 @@
-name: Resume Generate
+# Should:
+# 1. build resume.pdf from resume.tex
+# 2. publish via GitHub Pages
+name: Resume Generate and Deploy
+
+# Step 1: Create PDF
 
 on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,11 +23,35 @@ jobs:
       - name: Compile LaTeX with XeLaTeX
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: resume.tex
+          root_file: resume.tex # Main LaTeX file in repo root
           latexmk_use_xelatex: true
 
-      - name: Upload compiled PDF
-        uses: actions/upload-artifact@v4
+# Step 2: Generate XeLaTex(similar to Overleaf) with GitPages to present resume, similar to a README.md
+
+      - name: Prepare site for GitHub Pages
+        run: |
+          mkdir -p public
+          cp resume.pdf public/
+          cat > public/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>Ben Kinchen – Resume</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              html, body { margin: 0; height: 100%; }
+              iframe { border: 0; width: 100%; height: 100%; }
+            </style>
+          </head>
+          <body>
+            <iframe src="resume.pdf"></iframe>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          name: resume-pdf
-          path: resume.pdf
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
