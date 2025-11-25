@@ -25,6 +25,7 @@ jobs:
         with:
           root_file: resume.tex # Main LaTeX file in repo root
           latexmk_use_xelatex: true
+          texlive_version: 2024
 
 # Step 2: Generate XeLaTex(similar to Overleaf) with GitPages to present resume, similar to a README.md
 
